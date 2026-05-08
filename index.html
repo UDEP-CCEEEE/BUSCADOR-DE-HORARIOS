@@ -14,14 +14,11 @@
         .btn-buscar { width: 100%; padding: 12px; background-color: #003057; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 15px; }
         .ventana-resultados { background: white; min-height: 250px; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .ventana-resultados h2 { margin-top: 0; font-size: 18px; color: #003057; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        
-        .resultado-caja { background: #f9f9f9; padding: 12px; margin-bottom: 10px; border-radius: 5px; border-left: 5px solid #ccc; font-size: 14px; line-height: 1.5; }
-        .eval-nombre { font-weight: bold; color: #003057; display: block; margin-bottom: 3px; }
-        
+        .resultado-caja { background: #f9f9f9; padding: 12px; margin-bottom: 10px; border-radius: 5px; border-left: 5px solid #ccc; font-size: 14px; }
+        .eval-nombre { font-weight: bold; color: #003057; display: block; }
         .status-disponible { color: #28a745; font-weight: bold; } 
         .status-fuera { color: #e67e22; font-weight: bold; }       
         .status-no { color: #dc3545; font-weight: bold; }
-
         .error-anuncio { background-color: #ffebee; color: #c62828; padding: 30px; border-radius: 8px; text-align: center; font-weight: bold; border: 2px dashed #ef9a9a; margin-top: 40px; }
     </style>
 </head>
@@ -30,122 +27,94 @@
 <div class="contenedor-principal">
     <div class="fila-superior">
         <div class="ventana-input">
-            <label>Sigla del Curso</label>
+            <label>Sigla (Columna A)</label>
             <input type="text" id="txtCurso" placeholder="Ej: A1MT1">
         </div>
         <div class="ventana-input">
-            <label>Sección</label>
+            <label>Sección (Columna B)</label>
             <input type="text" id="txtSeccion" placeholder="Ej: C">
         </div>
     </div>
 
-    <button class="btn-buscar" onclick="procesarConsulta()">CONSULTAR DISPONIBILIDAD</button>
+    <button class="btn-buscar" onclick="procesarConsulta()">CONSULTAR EXCEL</button>
 
     <div class="ventana-resultados">
-        <h2 id="tituloResultados">Resultados de Búsqueda</h2>
+        <h2 id="tituloResultados">Resultados en Tiempo Real</h2>
         <div id="areaResultados">
-            <p style="color: #999; text-align: center; margin-top: 50px;">Ingrese los datos exactos del curso y sección.</p>
+            <p style="color: #999; text-align: center; margin-top: 50px;">Ingrese datos para leer el archivo de Rosa María.</p>
         </div>
     </div>
 </div>
 
 <script>
-    function procesarConsulta() {
+    // PEGA AQUÍ LA URL QUE TE DA POWER AUTOMATE AL GUARDAR EL FLUJO
+    const POWER_AUTOMATE_URL = "TU_URL_AQUÍ";
+
+    async function procesarConsulta() {
         const cursoIn = document.getElementById('txtCurso').value.trim().toUpperCase();
         const seccionIn = document.getElementById('txtSeccion').value.trim().toUpperCase();
         const area = document.getElementById('areaResultados');
         const titulo = document.getElementById('tituloResultados');
 
-        if (cursoIn === "" || seccionIn === "") {
-            alert("Por favor, completa la sigla y sección.");
-            return;
-        }
+        if (!cursoIn || !seccionIn) return alert("Completa los campos");
 
-        area.innerHTML = "<p style='text-align:center;'>Consultando datos específicos...</p>";
+        area.innerHTML = "<p style='text-align:center;'>Conectando con OneDrive UDEP...</p>";
 
-        setTimeout(() => {
-            const hoy = new Date();
+        try {
+            // Si ya tienes Power Automate, descomenta las siguientes líneas:
+            /*
+            const response = await fetch(POWER_AUTOMATE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ curso: cursoIn, seccion: seccionIn })
+            });
+            const data = await response.json();
+            */
             
-            /**
-             * BASE DE DATOS LOCAL
-             * Aquí es donde debes agregar la información real de cada curso y sección.
-             */
-            const baseDeDatos = {
-                "A1MT1-C": {
-                    evaluaciones: [
-                        { nombre: "PRÁCTICA 1", limite: new Date(2026, 4, 1), turno: "AM" },
-                        { nombre: "PRÁCTICA 2", limite: new Date(2026, 5, 15), turno: "PM" }
-                    ],
-                    reclamos: [
-                        { nombre: "PRIMER RECLAMO", estado: "DISPONIBLE", limite: new Date(2026, 5, 10) },
-                        { nombre: "SEGUNDO RECLAMO", estado: "NO DISPONIBLE", limite: null }
-                    ]
-                },
-                "A1MT1-A": {
-                    evaluaciones: [
-                        { nombre: "PRÁCTICA 1", limite: new Date(2026, 4, 20), turno: "PM" }
-                    ],
-                    reclamos: [
-                        { nombre: "PRIMER RECLAMO", estado: "NO DISPONIBLE", limite: null }
-                    ]
-                },
-                "B2FI1-B": {
-                    evaluaciones: [
-                        { nombre: "EXAMEN PARCIAL", limite: new Date(2026, 5, 20), turno: "AM" }
-                    ],
-                    reclamos: [
-                        { nombre: "PRIMER RECLAMO", estado: "DISPONIBLE", limite: new Date(2026, 5, 25) }
-                    ]
+            // Simulación de lo que el flujo leerá en la Fila de tu Excel
+            setTimeout(() => {
+                const hoy = new Date();
+                const fakeExcelRow = {
+                    "SIGLA": "A1MT1",
+                    "SECCIÓN": "C",
+                    "P1_LIMITE": "2026-05-01",
+                    "P1_TURNO": "AM",
+                    "P2_LIMITE": "2026-05-20",
+                    "P2_TURNO": "PM",
+                    "R1_ESTADO": "DISPONIBLE",
+                    "R1_LIMITE": "2026-05-15"
+                };
+
+                if (cursoIn !== fakeExcelRow.SIGLA || seccionIn !== fakeExcelRow.SECCIÓN) {
+                    titulo.innerText = "Error";
+                    area.innerHTML = `<div class="error-anuncio">CURSO O ERROR MAL ESCRITO</div>`;
+                    return;
                 }
-            };
 
-            const busquedaKey = `${cursoIn}-${seccionIn}`;
-            const datos = baseDeDatos[busquedaKey];
+                titulo.innerText = "Estado: " + cursoIn + " " + seccionIn;
+                
+                // Lógica de fechas automatizada
+                const limiteP1 = new Date(fakeExcelRow.P1_LIMITE);
+                const statusP1 = hoy > limiteP1 ? "FUERA DE VENTANILLA" : "DISPONIBLE";
+                const colorP1 = hoy > limiteP1 ? "#e67e22" : "#28a745";
 
-            if (!datos) {
-                titulo.innerText = "Error de Búsqueda";
-                area.innerHTML = `<div class="error-anuncio">CURSO O ERROR MAL ESCRITO</div>`;
-                return;
-            }
+                area.innerHTML = `
+                    <div class="resultado-caja" style="border-left-color: ${colorP1}">
+                        <span class="eval-nombre">PRÁCTICA 1:</span>
+                        <span class="${hoy > limiteP1 ? 'status-fuera' : 'status-disponible'}">${statusP1}</span>
+                        ${statusP1 === "DISPONIBLE" ? ` / VENCE EL ${limiteP1.getDate()}/${limiteP1.getMonth()+1} / TURNO ${fakeExcelRow.P1_TURNO}` : ""}
+                    </div>
+                    <div style='margin-top:20px; border-top: 1px solid #eee; padding-top:10px;'></div>
+                    <div class="resultado-caja" style="border-left-color: #28a745">
+                        <span class="eval-nombre">PRIMER RECLAMO:</span>
+                        <span class="status-disponible">${fakeExcelRow.R1_ESTADO}</span> / VENCE EL 15/5
+                    </div>
+                `;
+            }, 800);
 
-            // Si existe, renderizar resultados
-            titulo.innerText = "Estado: " + cursoIn + " " + seccionIn;
-            let html = "";
-
-            // Renderizado de Evaluaciones
-            datos.evaluaciones.forEach(ev => {
-                let texto = ""; let clase = ""; let color = ""; let info = "";
-                if (hoy > ev.limite) {
-                    texto = "FUERA DE VENTANILLA"; clase = "status-fuera"; color = "#e67e22";
-                } else {
-                    texto = "DISPONIBLE"; clase = "status-disponible"; color = "#28a745";
-                    info = ` / VENCE EL ${ev.limite.getDate()}/${ev.limite.getMonth()+1} / TURNO ${ev.turno}`;
-                }
-                html += `<div class="resultado-caja" style="border-left-color: ${color}">
-                            <span class="eval-nombre">${ev.nombre}:</span>
-                            <span class="${clase}">${texto}</span>${info}
-                         </div>`;
-            });
-
-            // Separador
-            html += "<div style='margin-top:20px; border-top: 1px solid #eee; padding-top:10px;'></div>";
-
-            // Renderizado de Reclamos
-            datos.reclamos.forEach(rec => {
-                let color = rec.estado === "DISPONIBLE" ? "#28a745" : "#dc3545";
-                let fInfo = "";
-                if (rec.estado === "DISPONIBLE" && rec.limite) {
-                    fInfo = ` / VENCE EL ${rec.limite.getDate()}/${rec.limite.getMonth()+1}`;
-                }
-                html += `<div class="resultado-caja" style="border-left-color: ${color}">
-                            <span class="eval-nombre">${rec.nombre}:</span>
-                            <span class="${rec.estado === 'DISPONIBLE' ? 'status-disponible' : 'status-no'}">${rec.estado}</span>${fInfo}
-                         </div>`;
-            });
-
-            area.innerHTML = html;
-
-        }, 600);
+        } catch (e) {
+            area.innerHTML = `<div class="error-anuncio">ERROR DE CONEXIÓN</div>`;
+        }
     }
 </script>
 
