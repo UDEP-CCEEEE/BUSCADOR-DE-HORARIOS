@@ -12,7 +12,7 @@
         .ventana-input label { display: block; font-size: 11px; font-weight: bold; color: #003057; margin-bottom: 5px; text-transform: uppercase; }
         .ventana-input input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box; }
         .btn-buscar { width: 100%; padding: 12px; background-color: #003057; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
-        .btn-buscar:hover { background-color: #004a85; transform: translateY(-1px); }
+        .btn-buscar:hover { background-color: #004a85; }
         .ventana-resultados { background: white; min-height: 250px; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .ventana-resultados h2 { margin-top: 0; font-size: 18px; color: #003057; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         
@@ -21,7 +21,19 @@
         
         .status-disponible { color: #28a745; font-weight: bold; } 
         .status-fuera { color: #e67e22; font-weight: bold; }       
-        .status-no { color: #dc3545; font-weight: bold; }          
+        .status-no { color: #dc3545; font-weight: bold; }
+
+        /* Estilo para el Error */
+        .error-anuncio {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            border: 2px dashed #ef9a9a;
+            margin-top: 40px;
+        }
     </style>
 </head>
 <body>
@@ -43,7 +55,7 @@
     <div class="ventana-resultados">
         <h2 id="tituloResultados">Resultados de Búsqueda</h2>
         <div id="areaResultados">
-            <p style="color: #999; text-align: center; margin-top: 50px;">Ingrese los datos para verificar el estado en ventanilla.</p>
+            <p style="color: #999; text-align: center; margin-top: 50px;">Ingrese los datos exactos del curso y sección.</p>
         </div>
     </div>
 </div>
@@ -53,42 +65,68 @@
         const curso = document.getElementById('txtCurso').value.trim().toUpperCase();
         const seccion = document.getElementById('txtSeccion').value.trim().toUpperCase();
         const area = document.getElementById('areaResultados');
+        const titulo = document.getElementById('tituloResultados');
 
         if (curso === "" || seccion === "") {
             alert("Por favor, completa la sigla y sección.");
             return;
         }
 
-        area.innerHTML = "<p style='text-align:center;'>Comparando fechas de recojo...</p>";
+        area.innerHTML = "<p style='text-align:center;'>Validando información...</p>";
 
         setTimeout(() => {
-            // Fecha de hoy para comparar
             const hoy = new Date();
             
-            // Simulación de datos que vendrían del Excel
-            // El formato de fecha aquí es Año, Mes (0-11), Día
-            const evaluaciones = [
-                { nombre: "PRÁCTICA 1", limite: new Date(2026, 4, 1), turno: "AM" }, // 1 de Mayo (Ya pasó)
-                { nombre: "PRÁCTICA 2", limite: new Date(2026, 4, 15), turno: "PM" }, // 15 de Mayo (Futuro)
-                { nombre: "EXAMEN PARCIAL", limite: new Date(2026, 4, 10), turno: "PM" }, // 10 de Mayo
-                { nombre: "PRÁCTICA 3", limite: null, turno: "" } // Aún no llega
+            /* 
+               BASE DE DATOS SIMULADA (Esto vendrá de tu Excel real)
+               Aquí definimos qué combinaciones REALMENTE existen.
+            */
+            const baseDatos = [
+                { id: "A1MT1-C", evaluaciones: [
+                    { nombre: "PRÁCTICA 1", limite: new Date(2026, 4, 1), turno: "AM" },
+                    { nombre: "PRÁCTICA 2", limite: new Date(2026, 4, 15), turno: "PM" }
+                ], reclamos: [
+                    { nombre: "PRIMER RECLAMO", estado: "DISPONIBLE", limite: new Date(2026, 4, 12) },
+                    { nombre: "SEGUNDO RECLAMO", estado: "NO DISPONIBLE", limite: null }
+                ]},
+                { id: "A1MT1-A", evaluaciones: [
+                    { nombre: "PRÁCTICA 1", limite: new Date(2026, 4, 5), turno: "PM" }
+                ], reclamos: [
+                    { nombre: "PRIMER RECLAMO", estado: "NO DISPONIBLE", limite: null }
+                ]}
             ];
 
-            const reclamos = { r1: "DISPONIBLE", r2: "NO DISPONIBLE" };
+            // 1. Validar si existe la combinación curso-sección
+            const busquedaID = `${curso}-${seccion}`;
+            const datosEncontrados = baseDatos.find(item => item.id === busquedaID);
 
+            if (!datosEncontrados) {
+                // Si no existe, arrojar el anuncio de error
+                titulo.innerText = "Error de Búsqueda";
+                area.innerHTML = `
+                    <div class="error-anuncio">
+                        CURSO O ERROR MAL ESCRITO
+                        <br><br>
+                        <span style="font-size: 12px; font-weight: normal; color: #666;">
+                            Verifica que la sigla y la sección correspondan a un curso registrado.
+                        </span>
+                    </div>
+                `;
+                return;
+            }
+
+            // 2. Si existe, procesar y mostrar
+            titulo.innerText = "Estado: " + curso + " " + seccion;
             let htmlFinal = "";
 
-            evaluaciones.forEach(ev => {
+            // Mostrar Evaluaciones
+            datosEncontrados.evaluaciones.forEach(ev => {
                 let textoEstado = "";
                 let claseEstado = "";
                 let colorBorde = "";
                 let detalleInfo = "";
 
-                if (!ev.limite) {
-                    textoEstado = "NO DISPONIBLE";
-                    claseEstado = "status-no";
-                    colorBorde = "#dc3545";
-                } else if (hoy > ev.limite) {
+                if (hoy > ev.limite) {
                     textoEstado = "FUERA DE VENTANILLA";
                     claseEstado = "status-fuera";
                     colorBorde = "#e67e22";
@@ -96,7 +134,6 @@
                     textoEstado = "DISPONIBLE";
                     claseEstado = "status-disponible";
                     colorBorde = "#28a745";
-                    // Formatear fecha para mostrar
                     const fCorta = ev.limite.getDate() + "/" + (ev.limite.getMonth() + 1);
                     detalleInfo = ` / VENCE EL ${fCorta} / TURNO ${ev.turno}`;
                 }
@@ -109,22 +146,26 @@
                 `;
             });
 
-            // Reclamos
-            htmlFinal += `
-                <div class="resultado-caja" style="border-left-color: ${reclamos.r1 === 'DISPONIBLE' ? '#28a745' : '#dc3545'}">
-                    <span class="eval-nombre">PRIMER RECLAMO:</span>
-                    <span class="${reclamos.r1 === 'DISPONIBLE' ? 'status-disponible' : 'status-no'}">${reclamos.r1}</span>
-                </div>
-                <div class="resultado-caja" style="border-left-color: ${reclamos.r2 === 'DISPONIBLE' ? '#28a745' : '#dc3545'}">
-                    <span class="eval-nombre">SEGUNDO RECLAMO:</span>
-                    <span class="${reclamos.r2 === 'DISPONIBLE' ? 'status-disponible' : 'status-no'}">${reclamos.r2}</span>
-                </div>
-            `;
+            // Mostrar Reclamos
+            htmlFinal += "<div style='margin-top:20px; border-top: 1px solid #eee; padding-top:10px;'></div>";
+            datosEncontrados.reclamos.forEach(rec => {
+                let colorBorde = rec.estado === "DISPONIBLE" ? "#28a745" : "#dc3545";
+                let infoFecha = "";
+                if (rec.estado === "DISPONIBLE" && rec.limite) {
+                    const fCorta = rec.limite.getDate() + "/" + (rec.limite.getMonth() + 1);
+                    infoFecha = ` / VENCE EL ${fCorta}`;
+                }
+                htmlFinal += `
+                    <div class="resultado-caja" style="border-left-color: ${colorBorde}">
+                        <span class="eval-nombre">${rec.nombre}:</span>
+                        <span class="${rec.estado === 'DISPONIBLE' ? 'status-disponible' : 'status-no'}">${rec.estado}</span>${infoFecha}
+                    </div>
+                `;
+            });
 
             area.innerHTML = htmlFinal;
-            document.getElementById('tituloResultados').innerText = "Estado: " + curso + " " + seccion;
 
-        }, 700);
+        }, 600);
     }
 </script>
 
