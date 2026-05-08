@@ -11,8 +11,7 @@
         .ventana-input { flex: 1; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-top: 4px solid #003057; }
         .ventana-input label { display: block; font-size: 11px; font-weight: bold; color: #003057; margin-bottom: 5px; text-transform: uppercase; }
         .ventana-input input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; box-sizing: border-box; }
-        .btn-buscar { width: 100%; padding: 12px; background-color: #003057; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
-        .btn-buscar:hover { background-color: #004a85; }
+        .btn-buscar { width: 100%; padding: 12px; background-color: #003057; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 15px; }
         .ventana-resultados { background: white; min-height: 250px; border-radius: 8px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .ventana-resultados h2 { margin-top: 0; font-size: 18px; color: #003057; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         
@@ -23,17 +22,7 @@
         .status-fuera { color: #e67e22; font-weight: bold; }       
         .status-no { color: #dc3545; font-weight: bold; }
 
-        /* Estilo para el Error */
-        .error-anuncio {
-            background-color: #ffebee;
-            color: #c62828;
-            padding: 30px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
-            border: 2px dashed #ef9a9a;
-            margin-top: 40px;
-        }
+        .error-anuncio { background-color: #ffebee; color: #c62828; padding: 30px; border-radius: 8px; text-align: center; font-weight: bold; border: 2px dashed #ef9a9a; margin-top: 40px; }
     </style>
 </head>
 <body>
@@ -62,108 +51,99 @@
 
 <script>
     function procesarConsulta() {
-        const curso = document.getElementById('txtCurso').value.trim().toUpperCase();
-        const seccion = document.getElementById('txtSeccion').value.trim().toUpperCase();
+        const cursoIn = document.getElementById('txtCurso').value.trim().toUpperCase();
+        const seccionIn = document.getElementById('txtSeccion').value.trim().toUpperCase();
         const area = document.getElementById('areaResultados');
         const titulo = document.getElementById('tituloResultados');
 
-        if (curso === "" || seccion === "") {
+        if (cursoIn === "" || seccionIn === "") {
             alert("Por favor, completa la sigla y sección.");
             return;
         }
 
-        area.innerHTML = "<p style='text-align:center;'>Validando información...</p>";
+        area.innerHTML = "<p style='text-align:center;'>Consultando datos específicos...</p>";
 
         setTimeout(() => {
             const hoy = new Date();
             
-            /* 
-               BASE DE DATOS SIMULADA (Esto vendrá de tu Excel real)
-               Aquí definimos qué combinaciones REALMENTE existen.
-            */
-            const baseDatos = [
-                { id: "A1MT1-C", evaluaciones: [
-                    { nombre: "PRÁCTICA 1", limite: new Date(2026, 4, 1), turno: "AM" },
-                    { nombre: "PRÁCTICA 2", limite: new Date(2026, 4, 15), turno: "PM" }
-                ], reclamos: [
-                    { nombre: "PRIMER RECLAMO", estado: "DISPONIBLE", limite: new Date(2026, 4, 12) },
-                    { nombre: "SEGUNDO RECLAMO", estado: "NO DISPONIBLE", limite: null }
-                ]},
-                { id: "A1MT1-A", evaluaciones: [
-                    { nombre: "PRÁCTICA 1", limite: new Date(2026, 4, 5), turno: "PM" }
-                ], reclamos: [
-                    { nombre: "PRIMER RECLAMO", estado: "NO DISPONIBLE", limite: null }
-                ]}
-            ];
+            /**
+             * BASE DE DATOS LOCAL
+             * Aquí es donde debes agregar la información real de cada curso y sección.
+             */
+            const baseDeDatos = {
+                "A1MT1-C": {
+                    evaluaciones: [
+                        { nombre: "PRÁCTICA 1", limite: new Date(2026, 4, 1), turno: "AM" },
+                        { nombre: "PRÁCTICA 2", limite: new Date(2026, 5, 15), turno: "PM" }
+                    ],
+                    reclamos: [
+                        { nombre: "PRIMER RECLAMO", estado: "DISPONIBLE", limite: new Date(2026, 5, 10) },
+                        { nombre: "SEGUNDO RECLAMO", estado: "NO DISPONIBLE", limite: null }
+                    ]
+                },
+                "A1MT1-A": {
+                    evaluaciones: [
+                        { nombre: "PRÁCTICA 1", limite: new Date(2026, 4, 20), turno: "PM" }
+                    ],
+                    reclamos: [
+                        { nombre: "PRIMER RECLAMO", estado: "NO DISPONIBLE", limite: null }
+                    ]
+                },
+                "B2FI1-B": {
+                    evaluaciones: [
+                        { nombre: "EXAMEN PARCIAL", limite: new Date(2026, 5, 20), turno: "AM" }
+                    ],
+                    reclamos: [
+                        { nombre: "PRIMER RECLAMO", estado: "DISPONIBLE", limite: new Date(2026, 5, 25) }
+                    ]
+                }
+            };
 
-            // 1. Validar si existe la combinación curso-sección
-            const busquedaID = `${curso}-${seccion}`;
-            const datosEncontrados = baseDatos.find(item => item.id === busquedaID);
+            const busquedaKey = `${cursoIn}-${seccionIn}`;
+            const datos = baseDeDatos[busquedaKey];
 
-            if (!datosEncontrados) {
-                // Si no existe, arrojar el anuncio de error
+            if (!datos) {
                 titulo.innerText = "Error de Búsqueda";
-                area.innerHTML = `
-                    <div class="error-anuncio">
-                        CURSO O ERROR MAL ESCRITO
-                        <br><br>
-                        <span style="font-size: 12px; font-weight: normal; color: #666;">
-                            Verifica que la sigla y la sección correspondan a un curso registrado.
-                        </span>
-                    </div>
-                `;
+                area.innerHTML = `<div class="error-anuncio">CURSO O ERROR MAL ESCRITO</div>`;
                 return;
             }
 
-            // 2. Si existe, procesar y mostrar
-            titulo.innerText = "Estado: " + curso + " " + seccion;
-            let htmlFinal = "";
+            // Si existe, renderizar resultados
+            titulo.innerText = "Estado: " + cursoIn + " " + seccionIn;
+            let html = "";
 
-            // Mostrar Evaluaciones
-            datosEncontrados.evaluaciones.forEach(ev => {
-                let textoEstado = "";
-                let claseEstado = "";
-                let colorBorde = "";
-                let detalleInfo = "";
-
+            // Renderizado de Evaluaciones
+            datos.evaluaciones.forEach(ev => {
+                let texto = ""; let clase = ""; let color = ""; let info = "";
                 if (hoy > ev.limite) {
-                    textoEstado = "FUERA DE VENTANILLA";
-                    claseEstado = "status-fuera";
-                    colorBorde = "#e67e22";
+                    texto = "FUERA DE VENTANILLA"; clase = "status-fuera"; color = "#e67e22";
                 } else {
-                    textoEstado = "DISPONIBLE";
-                    claseEstado = "status-disponible";
-                    colorBorde = "#28a745";
-                    const fCorta = ev.limite.getDate() + "/" + (ev.limite.getMonth() + 1);
-                    detalleInfo = ` / VENCE EL ${fCorta} / TURNO ${ev.turno}`;
+                    texto = "DISPONIBLE"; clase = "status-disponible"; color = "#28a745";
+                    info = ` / VENCE EL ${ev.limite.getDate()}/${ev.limite.getMonth()+1} / TURNO ${ev.turno}`;
                 }
-
-                htmlFinal += `
-                    <div class="resultado-caja" style="border-left-color: ${colorBorde}">
-                        <span class="eval-nombre">${ev.nombre}:</span>
-                        <span class="${claseEstado}">${textoEstado}</span>${detalleInfo}
-                    </div>
-                `;
+                html += `<div class="resultado-caja" style="border-left-color: ${color}">
+                            <span class="eval-nombre">${ev.nombre}:</span>
+                            <span class="${clase}">${texto}</span>${info}
+                         </div>`;
             });
 
-            // Mostrar Reclamos
-            htmlFinal += "<div style='margin-top:20px; border-top: 1px solid #eee; padding-top:10px;'></div>";
-            datosEncontrados.reclamos.forEach(rec => {
-                let colorBorde = rec.estado === "DISPONIBLE" ? "#28a745" : "#dc3545";
-                let infoFecha = "";
+            // Separador
+            html += "<div style='margin-top:20px; border-top: 1px solid #eee; padding-top:10px;'></div>";
+
+            // Renderizado de Reclamos
+            datos.reclamos.forEach(rec => {
+                let color = rec.estado === "DISPONIBLE" ? "#28a745" : "#dc3545";
+                let fInfo = "";
                 if (rec.estado === "DISPONIBLE" && rec.limite) {
-                    const fCorta = rec.limite.getDate() + "/" + (rec.limite.getMonth() + 1);
-                    infoFecha = ` / VENCE EL ${fCorta}`;
+                    fInfo = ` / VENCE EL ${rec.limite.getDate()}/${rec.limite.getMonth()+1}`;
                 }
-                htmlFinal += `
-                    <div class="resultado-caja" style="border-left-color: ${colorBorde}">
-                        <span class="eval-nombre">${rec.nombre}:</span>
-                        <span class="${rec.estado === 'DISPONIBLE' ? 'status-disponible' : 'status-no'}">${rec.estado}</span>${infoFecha}
-                    </div>
-                `;
+                html += `<div class="resultado-caja" style="border-left-color: ${color}">
+                            <span class="eval-nombre">${rec.nombre}:</span>
+                            <span class="${rec.estado === 'DISPONIBLE' ? 'status-disponible' : 'status-no'}">${rec.estado}</span>${fInfo}
+                         </div>`;
             });
 
-            area.innerHTML = htmlFinal;
+            area.innerHTML = html;
 
         }, 600);
     }
