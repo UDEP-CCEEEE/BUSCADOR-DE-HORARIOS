@@ -63,9 +63,8 @@
         lista.innerHTML = "<p style='text-align:center;'>Buscando información...</p>";
 
         try {
-            // Intentamos cargar el archivo. 
-            // Si el nombre en GitHub es exactamente datos.json, usa este:
-            const response = await fetch('datos.json');
+            // AHORA EL CÓDIGO BUSCA EXACTAMENTE EL NOMBRE QUE TIENE TU ARCHIVO
+            const response = await fetch('datos.json.xlsx');
             
             if (!response.ok) throw new Error("Archivo no encontrado");
 
@@ -77,17 +76,18 @@
             );
 
             if (!encontrado) {
-                lista.innerHTML = "<div class='error-anuncio'>CURSO O ERROR MAL ESCRITO</div>";
+                lista.innerHTML = "<div class='error-anuncio'>CURSO O SECCIÓN NO ENCONTRADOS</div>";
                 return;
             }
 
             renderizar(encontrado);
 
         } catch (error) {
+            console.error("Error detallado:", error);
             lista.innerHTML = `
                 <div class='error-anuncio'>
-                    ERROR: No se pudo leer el archivo de datos.<br>
-                    <small style="font-weight:normal;">Asegúrate de que el archivo se llame 'datos.json' y no 'datos.json.xlsx'</small>
+                    ERROR: El archivo 'datos.json.xlsx' no es un JSON válido.<br>
+                    <small style="font-weight:normal;">Asegúrate de que el contenido del archivo sea texto (formato JSON) y no un archivo de Excel real.</small>
                 </div>`;
         }
     }
@@ -96,7 +96,6 @@
         const hoy = new Date();
         let html = "";
 
-        // Evaluaciones
         datos.evaluaciones.forEach(ev => {
             const fLimite = new Date(ev.limite);
             fLimite.setHours(23, 59, 59);
@@ -115,14 +114,11 @@
             `;
         });
 
-        // Separador si hay reclamos
         if(datos.reclamos && datos.reclamos.length > 0) {
             html += "<div style='margin: 15px 0; border-top: 1px solid #eee;'></div>";
-            
             datos.reclamos.forEach(rec => {
                 const esDisp = rec.estado.toUpperCase() === "DISPONIBLE";
                 const colorRec = esDisp ? "#27ae60" : "#c0392b";
-                
                 html += `
                     <div class="resultado-item" style="border-left-color: ${colorRec}">
                         <span class="nombre-ev">${rec.nombre}</span>
@@ -131,7 +127,6 @@
                 `;
             });
         }
-
         document.getElementById('listaResultados').innerHTML = html;
     }
 </script>
