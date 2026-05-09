@@ -3,108 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistente de Ventanilla UDEP</title>
+    <title>Asistente UDEP</title>
     <style>
-        :root { --udep-blue: #003057; --udep-gold: #f1b434; }
-        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .contenedor { width: 100%; max-width: 500px; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; border-top: 6px solid var(--udep-blue); }
-        .fila-inputs { display: flex; gap: 10px; }
-        label { display: block; font-size: 11px; font-weight: bold; color: var(--udep-blue); margin-bottom: 5px; text-transform: uppercase; }
-        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; text-transform: uppercase; }
-        button { width: 100%; padding: 15px; background: var(--udep-gold); color: var(--udep-blue); border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 15px; width: 100%; }
-        .resultado-item { background: #fff; padding: 15px; border-radius: 8px; border-left: 6px solid #ccc; margin-bottom: 10px; border: 1px solid #eee; border-left-width: 6px; }
-        .nombre-ev { font-weight: bold; color: var(--udep-blue); display: block; }
-        .disponible { color: #27ae60; font-weight: bold; }
-        .fuera { color: #e67e22; font-weight: bold; }
-        .error-anuncio { background: #fee; color: #c33; padding: 20px; border-radius: 8px; text-align: center; font-weight: bold; border: 2px dashed #c33; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; padding: 20px; display: flex; justify-content: center; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; border-top: 8px solid #003057; }
+        h2 { color: #003057; text-align: center; margin-top: 0; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #003057; font-size: 14px; }
+        input { width: 100%; padding: 12px; border: 2px solid #e1e8ed; border-radius: 8px; box-sizing: border-box; font-size: 16px; outline: none; }
+        input:focus { border-color: #f1b434; }
+        button { width: 100%; padding: 15px; background: #f1b434; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: #003057; font-size: 16px; transition: 0.3s; }
+        button:hover { background: #e0a32a; }
+        #pantalla { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+        .res-item { padding: 12px; margin-bottom: 10px; border-radius: 8px; border-left: 6px solid #ccc; background: #f9f9f9; }
+        .msg { padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; }
+        .error { background: #ffebee; color: #c62828; }
+        .info { color: #555; }
     </style>
 </head>
 <body>
 
-<div class="contenedor">
-    <div class="card">
-        <div class="fila-inputs">
-            <div style="flex:2">
-                <label>Sigla</label>
-                <input type="text" id="curso" placeholder="A1MT1">
-            </div>
-            <div style="flex:1">
-                <label>Sección</label>
-                <input type="text" id="seccion" placeholder="C">
-            </div>
-        </div>
-        <button onclick="buscar()">CONSULTAR VENTANILLA</button>
+<div class="card">
+    <h2>Ventanilla UDEP</h2>
+    
+    <div class="input-group">
+        <label>Sigla del Curso (Ej: A1MT1)</label>
+        <input type="text" id="curso" placeholder="Ingrese sigla...">
+    </div>
+    
+    <div class="input-group">
+        <label>Sección (Ej: C)</label>
+        <input type="text" id="seccion" placeholder="Ingrese sección...">
     </div>
 
-    <div class="card" id="panel">
-        <h3 style="margin-top:0; color: var(--udep-blue);">Resultados</h3>
-        <div id="lista">Ingrese datos para buscar.</div>
+    <button onclick="buscar()">CONSULTAR AHORA</button>
+
+    <div id="pantalla">
+        <p class="msg info">Esperando consulta...</p>
     </div>
 </div>
 
 <script>
     async function buscar() {
-        const cIn = document.getElementById('curso').value.trim().toUpperCase();
-        const sIn = document.getElementById('seccion').value.trim().toUpperCase();
-        const lista = document.getElementById('lista');
+        const cursoIn = document.getElementById('curso').value.trim().toUpperCase();
+        const seccionIn = document.getElementById('seccion').value.trim().toUpperCase();
+        const pantalla = document.getElementById('pantalla');
 
-        if (!cIn || !sIn) return alert("Ingresa Sigla y Sección");
+        if (!cursoIn || !seccionIn) {
+            pantalla.innerHTML = "<div class='msg error'>Por favor complete los dos campos.</div>";
+            return;
+        }
 
-        lista.innerHTML = "Buscando...";
+        pantalla.innerHTML = "<p class='msg info'>Buscando en la base de datos...</p>";
 
         try {
-            // Buscamos el archivo con el nombre correcto
-            const response = await fetch('datos.json');
-            if (!response.ok) throw new Error("No se encuentra el archivo datos.json");
+            // Buscamos el archivo datos.json
+            const respuesta = await fetch('datos.json?v=' + new Date().getTime()); // El ?v= evita que el navegador use datos viejos
+            
+            if (!respuesta.ok) throw new Error("No se pudo cargar 'datos.json'. Verifica que el nombre sea exacto.");
 
-            const data = await response.json();
+            const data = await respuesta.json();
 
-            const encontrado = data.find(item => 
-                item.sigla.toUpperCase() === cIn && 
-                item.seccion.toUpperCase() === sIn
+            // Búsqueda exacta ignorando espacios y mayúsculas
+            const resultado = data.find(item => 
+                item.sigla.trim().toUpperCase() === cursoIn && 
+                item.seccion.trim().toUpperCase() === seccionIn
             );
 
-            if (!encontrado) {
-                lista.innerHTML = "<div class='error-anuncio'>CURSO O SECCIÓN NO ENCONTRADOS</div>";
+            if (!resultado) {
+                pantalla.innerHTML = `<div class='msg error'>NO ENCONTRADO:<br>El curso ${cursoIn} sección ${seccionIn} no existe en el archivo.</div>`;
                 return;
             }
 
-            render(encontrado);
-        } catch (e) {
-            lista.innerHTML = `<div class='error-anuncio'>ERROR: Asegúrate de que el archivo se llame 'datos.json' y sea texto válido.</div>`;
-        }
-    }
+            // Si lo encuentra, dibujamos los resultados
+            let html = `<h4 style="margin:0 0 10px 0; color:#003057;">${resultado.sigla} - Sección ${resultado.seccion}</h4>`;
+            const hoy = new Date();
 
-    function render(datos) {
-        const hoy = new Date();
-        let html = "";
-
-        datos.evaluaciones.forEach(ev => {
-            const fLim = new Date(ev.limite);
-            fLim.setHours(23, 59, 59);
-            const isDisp = hoy <= fLim;
-            
-            html += `
-                <div class="resultado-item" style="border-left-color: ${isDisp ? '#27ae60' : '#e67e22'}">
-                    <span class="nombre-ev">${ev.nombre}</span>
-                    <span class="${isDisp ? 'disponible' : 'fuera'}">${isDisp ? 'DISPONIBLE' : 'FUERA DE VENTANILLA'}</span>
-                    ${isDisp ? ` / VENCE: ${fLim.getDate()}/${fLim.getMonth()+1} / TURNO: ${ev.turno}` : ''}
-                </div>`;
-        });
-
-        if (datos.reclamos) {
-            html += "<hr style='border:0; border-top:1px solid #eee; margin:15px 0;'>";
-            datos.reclamos.forEach(re => {
-                const esOk = re.estado.toUpperCase() === "DISPONIBLE";
+            resultado.evaluaciones.forEach(ev => {
+                const fLim = new Date(ev.limite);
+                fLim.setHours(23, 59, 59); // Margen hasta final del día
+                
+                const disponible = hoy <= fLim;
+                const color = disponible ? "#28a745" : "#e67e22";
+                
                 html += `
-                    <div class="resultado-item" style="border-left-color: ${esOk ? '#27ae60' : '#c0392b'}">
-                        <span class="nombre-ev">${re.nombre}</span>
-                        <span style="color:${esOk ? '#27ae60' : '#c0392b'}; font-weight:bold;">${re.estado}</span>
+                    <div class="res-item" style="border-left-color: ${color}">
+                        <strong style="display:block;">${ev.nombre}</strong> 
+                        <span style="color: ${color}; font-weight: bold; font-size:14px;">
+                            ${disponible ? '● DISPONIBLE' : '● FUERA DE VENTANILLA'}
+                        </span>
+                        <br><small style="color:#666;">${disponible ? 'Vence: ' + fLim.toLocaleDateString() + ' | Turno: ' + ev.turno : 'Cerrado'}</small>
                     </div>`;
             });
+
+            if (resultado.reclamos) {
+                html += "<div style='margin:15px 0; border-top:2px dashed #eee;'></div>";
+                resultado.reclamos.forEach(r => {
+                    const esDisp = r.estado.toUpperCase() === "DISPONIBLE";
+                    html += `
+                        <div class="res-item" style="border-left-color: ${esDisp ? '#28a745' : '#c0392b'}">
+                            <strong>${r.nombre}:</strong> 
+                            <span style="color:${esDisp ? '#28a745' : '#c0392b'}; font-weight:bold;">${r.estado}</span>
+                        </div>`;
+                });
+            }
+
+            pantalla.innerHTML = html;
+
+        } catch (error) {
+            pantalla.innerHTML = `<div class='msg error'>ERROR CRÍTICO:<br>${error.message}</div>`;
         }
-        document.getElementById('lista').innerHTML = html;
     }
 </script>
 
