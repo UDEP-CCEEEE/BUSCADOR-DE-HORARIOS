@@ -6,21 +6,17 @@
     <title>Asistente de Ventanilla UDEP</title>
     <style>
         :root { --udep-blue: #003057; --udep-gold: #f1b434; }
-        body { background-color: #f4f7f9; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .contenedor { width: 100%; max-width: 550px; }
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .contenedor { width: 100%; max-width: 500px; }
         .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px; border-top: 6px solid var(--udep-blue); }
-        .fila-inputs { display: flex; gap: 15px; }
-        .input-group { flex: 1; }
+        .fila-inputs { display: flex; gap: 10px; }
         label { display: block; font-size: 11px; font-weight: bold; color: var(--udep-blue); margin-bottom: 5px; text-transform: uppercase; }
-        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; text-transform: uppercase; }
-        button { width: 100%; padding: 15px; background: var(--udep-gold); color: var(--udep-blue); border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 15px; }
-        button:hover { background: #d9a12e; }
-        .resultado-item { background: #fdfdfd; padding: 15px; border-radius: 8px; border-left: 6px solid #ccc; margin-bottom: 12px; border: 1px solid #eee; }
-        .nombre-ev { font-weight: bold; color: var(--udep-blue); display: block; margin-bottom: 4px; }
-        .status-badge { font-weight: bold; font-size: 13px; }
-        .disponible { color: #27ae60; }
-        .fuera { color: #e67e22; }
-        .no-disp { color: #c0392b; }
+        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; text-transform: uppercase; }
+        button { width: 100%; padding: 15px; background: var(--udep-gold); color: var(--udep-blue); border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 15px; width: 100%; }
+        .resultado-item { background: #fff; padding: 15px; border-radius: 8px; border-left: 6px solid #ccc; margin-bottom: 10px; border: 1px solid #eee; border-left-width: 6px; }
+        .nombre-ev { font-weight: bold; color: var(--udep-blue); display: block; }
+        .disponible { color: #27ae60; font-weight: bold; }
+        .fuera { color: #e67e22; font-weight: bold; }
         .error-anuncio { background: #fee; color: #c33; padding: 20px; border-radius: 8px; text-align: center; font-weight: bold; border: 2px dashed #c33; }
     </style>
 </head>
@@ -29,50 +25,44 @@
 <div class="contenedor">
     <div class="card">
         <div class="fila-inputs">
-            <div class="input-group">
-                <label>Sigla del Curso</label>
-                <input type="text" id="curso" placeholder="Ej: A1MT1">
+            <div style="flex:2">
+                <label>Sigla</label>
+                <input type="text" id="curso" placeholder="A1MT1">
             </div>
-            <div class="input-group">
+            <div style="flex:1">
                 <label>Sección</label>
-                <input type="text" id="seccion" placeholder="Ej: C">
+                <input type="text" id="seccion" placeholder="C">
             </div>
         </div>
-        <button onclick="buscarEvaluaciones()">CONSULTAR DISPONIBILIDAD</button>
+        <button onclick="buscar()">CONSULTAR VENTANILLA</button>
     </div>
 
-    <div class="card" id="panelResultados">
-        <h3 style="margin-top:0; color: var(--udep-blue); font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 10px;">Estado de Ventanilla</h3>
-        <div id="listaResultados">
-            <p style="text-align:center; color:#888;">Ingrese los datos del curso.</p>
-        </div>
+    <div class="card" id="panel">
+        <h3 style="margin-top:0; color: var(--udep-blue);">Resultados</h3>
+        <div id="lista">Ingrese datos para buscar.</div>
     </div>
 </div>
 
 <script>
-    async function buscarEvaluaciones() {
-        const cursoIn = document.getElementById('curso').value.trim().toUpperCase();
-        const seccionIn = document.getElementById('seccion').value.trim().toUpperCase();
-        const lista = document.getElementById('listaResultados');
+    async function buscar() {
+        const cIn = document.getElementById('curso').value.trim().toUpperCase();
+        const sIn = document.getElementById('seccion').value.trim().toUpperCase();
+        const lista = document.getElementById('lista');
 
-        if (!cursoIn || !seccionIn) {
-            alert("Por favor, completa ambos campos.");
-            return;
-        }
+        if (!cIn || !sIn) return alert("Ingresa Sigla y Sección");
 
-        lista.innerHTML = "<p style='text-align:center;'>Buscando información...</p>";
+        lista.innerHTML = "Buscando...";
 
         try {
-            // AHORA EL CÓDIGO BUSCA EXACTAMENTE EL NOMBRE QUE TIENE TU ARCHIVO
-            const response = await fetch('datos.json.xlsx');
-            
-            if (!response.ok) throw new Error("Archivo no encontrado");
+            // Buscamos el archivo con el nombre correcto
+            const response = await fetch('datos.json');
+            if (!response.ok) throw new Error("No se encuentra el archivo datos.json");
 
             const data = await response.json();
 
-            const encontrado = data.find(c => 
-                c.sigla.toUpperCase() === cursoIn && 
-                c.seccion.toUpperCase() === seccionIn
+            const encontrado = data.find(item => 
+                item.sigla.toUpperCase() === cIn && 
+                item.seccion.toUpperCase() === sIn
             );
 
             if (!encontrado) {
@@ -80,54 +70,41 @@
                 return;
             }
 
-            renderizar(encontrado);
-
-        } catch (error) {
-            console.error("Error detallado:", error);
-            lista.innerHTML = `
-                <div class='error-anuncio'>
-                    ERROR: El archivo 'datos.json.xlsx' no es un JSON válido.<br>
-                    <small style="font-weight:normal;">Asegúrate de que el contenido del archivo sea texto (formato JSON) y no un archivo de Excel real.</small>
-                </div>`;
+            render(encontrado);
+        } catch (e) {
+            lista.innerHTML = `<div class='error-anuncio'>ERROR: Asegúrate de que el archivo se llame 'datos.json' y sea texto válido.</div>`;
         }
     }
 
-    function renderizar(datos) {
+    function render(datos) {
         const hoy = new Date();
         let html = "";
 
         datos.evaluaciones.forEach(ev => {
-            const fLimite = new Date(ev.limite);
-            fLimite.setHours(23, 59, 59);
-
-            let status = hoy > fLimite ? "FUERA DE VENTANILLA" : "DISPONIBLE";
-            let clase = hoy > fLimite ? "fuera" : "disponible";
-            let color = hoy > fLimite ? "#e67e22" : "#27ae60";
-            let fechaTxt = `${fLimite.getDate()}/${fLimite.getMonth() + 1}`;
-
+            const fLim = new Date(ev.limite);
+            fLim.setHours(23, 59, 59);
+            const isDisp = hoy <= fLim;
+            
             html += `
-                <div class="resultado-item" style="border-left-color: ${color}">
+                <div class="resultado-item" style="border-left-color: ${isDisp ? '#27ae60' : '#e67e22'}">
                     <span class="nombre-ev">${ev.nombre}</span>
-                    <span class="status-badge ${clase}">${status}</span> 
-                    ${status === "DISPONIBLE" ? `/ VENCE EL ${fechaTxt} / TURNO ${ev.turno}` : ""}
-                </div>
-            `;
+                    <span class="${isDisp ? 'disponible' : 'fuera'}">${isDisp ? 'DISPONIBLE' : 'FUERA DE VENTANILLA'}</span>
+                    ${isDisp ? ` / VENCE: ${fLim.getDate()}/${fLim.getMonth()+1} / TURNO: ${ev.turno}` : ''}
+                </div>`;
         });
 
-        if(datos.reclamos && datos.reclamos.length > 0) {
-            html += "<div style='margin: 15px 0; border-top: 1px solid #eee;'></div>";
-            datos.reclamos.forEach(rec => {
-                const esDisp = rec.estado.toUpperCase() === "DISPONIBLE";
-                const colorRec = esDisp ? "#27ae60" : "#c0392b";
+        if (datos.reclamos) {
+            html += "<hr style='border:0; border-top:1px solid #eee; margin:15px 0;'>";
+            datos.reclamos.forEach(re => {
+                const esOk = re.estado.toUpperCase() === "DISPONIBLE";
                 html += `
-                    <div class="resultado-item" style="border-left-color: ${colorRec}">
-                        <span class="nombre-ev">${rec.nombre}</span>
-                        <span class="status-badge ${esDisp ? 'disponible' : 'no-disp'}">${rec.estado}</span>
-                    </div>
-                `;
+                    <div class="resultado-item" style="border-left-color: ${esOk ? '#27ae60' : '#c0392b'}">
+                        <span class="nombre-ev">${re.nombre}</span>
+                        <span style="color:${esOk ? '#27ae60' : '#c0392b'}; font-weight:bold;">${re.estado}</span>
+                    </div>`;
             });
         }
-        document.getElementById('listaResultados').innerHTML = html;
+        document.getElementById('lista').innerHTML = html;
     }
 </script>
 
