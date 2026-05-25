@@ -259,7 +259,7 @@ h1{
 
     </div>
 
-    <!-- CÓDIGOS SOLO PARA PRUEBA -->
+    <!-- SOLO PARA PRUEBAS -->
     <div class="listaCodigos">
 
         <b>Códigos de prueba:</b><br><br>
@@ -302,7 +302,7 @@ function verificarCodigo(){
 
     resultado.style.display = "block";
 
-    /* SI EL CÓDIGO ES GANADOR */
+    /* SI GANA */
 
     if(codigo === codigoGanador){
 
@@ -314,11 +314,11 @@ function verificarCodigo(){
         mensaje.className = "mensaje ganador";
 
         // IMAGEN GANADOR
-        imagen.src = "ganador.png.jpeg";
+        imagen.src = "ganador.png";
 
     }
 
-    /* CUALQUIER OTRO CÓDIGO */
+    /* SI PIERDE */
 
     else{
 
@@ -330,7 +330,7 @@ function verificarCodigo(){
         mensaje.className = "mensaje perdedor";
 
         // IMAGEN PERDEDOR
-        imagen.src = "perdedor.png.jpeg";
+        imagen.src = "perdedor.png";
 
     }
 
