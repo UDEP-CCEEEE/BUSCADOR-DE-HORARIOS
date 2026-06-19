@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis - Control de Disponibilidad Docente v2.0</title>
+    <title>Jarvis - Planificador de Reuniones Docentes</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-blue: #0052cc; /* Color azul del proyecto */
+            --primary-blue: #0052cc; /* Color azul corporativo */
             --light-blue: #deebff;
             --danger-red: #d93025;
             --bg-gray: #f4f5f7;
@@ -29,7 +29,7 @@
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
             background: #ffffff;
             padding: 30px;
@@ -67,15 +67,36 @@
             font-weight: 600;
         }
 
+        /* Contenedor de Multi-Buscadores */
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .search-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .search-group label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #5e6c84;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .search-box {
             position: relative;
-            margin-bottom: 25px;
         }
 
         .search-box input {
             width: 100%;
-            padding: 14px 20px;
-            font-size: 16px;
+            padding: 12px 15px;
+            font-size: 14px;
             border: 2px solid var(--border-color);
             border-radius: 8px;
             outline: none;
@@ -95,7 +116,7 @@
             background: white;
             border: 1px solid var(--border-color);
             border-radius: 0 0 8px 8px;
-            max-height: 250px;
+            max-height: 200px;
             overflow-y: auto;
             z-index: 10;
             box-shadow: 0 8px 16px rgba(9,30,66,0.15);
@@ -103,9 +124,9 @@
         }
 
         .suggestions div {
-            padding: 12px 20px;
+            padding: 10px 15px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             border-bottom: 1px solid #f4f5f7;
         }
 
@@ -119,15 +140,20 @@
             font-weight: 500;
         }
 
+        /* Calendario */
         .schedule-card {
             margin-top: 20px;
         }
 
         .teacher-info {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             margin-bottom: 15px;
             color: #091e42;
+            background: #fafbfc;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--primary-blue);
         }
 
         table {
@@ -139,9 +165,10 @@
 
         th, td {
             border: 1px solid var(--border-color);
-            padding: 10px;
+            padding: 8px;
             text-align: center;
-            font-size: 13px;
+            font-size: 12px;
+            height: 46px; /* Altura fija para mantener simetría */
         }
 
         th {
@@ -159,35 +186,41 @@
             font-weight: 600;
             background-color: #fafbfc;
             color: #5e6c84;
+            font-size: 12px;
         }
 
-        /* Bloque Ocupado (Azul corporativo) */
+        /* Bloque Ocupado (Acumulativo) */
         .occupied {
             background-color: var(--primary-blue) !important;
             color: white;
-            font-weight: 600;
-            font-size: 11px;
-            letter-spacing: 0.5px;
-            animation: fadeIn 0.25s ease;
+            font-weight: 500;
+            font-size: 10px;
+            line-height: 1.2;
+            padding: 4px;
+            animation: fadeIn 0.2s ease;
         }
 
-        /* Nota informativa en Rojo */
+        /* Contenedor de Alertas Rojas */
+        .notes-container {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
         .shared-note {
-            display: none;
             background-color: #ffebe6;
             color: var(--danger-red);
-            padding: 12px 15px;
+            padding: 10px 15px;
             border-radius: 6px;
             font-weight: 600;
-            font-size: 14px;
-            margin-top: 15px;
+            font-size: 13px;
             border-left: 5px solid var(--danger-red);
-            animation: fadeIn 0.3s ease;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-2px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
@@ -196,19 +229,42 @@
 <div class="container">
     <header>
         <div>
-            <h1>Jarvis - Disponibilidad Docente</h1>
-            <p>Introduce el nombre de un docente para visualizar gráficamente sus bloques de clase ocupados.</p>
+            <h1>Jarvis - Planificador Multi-Docente</h1>
+            <p>Cruza los horarios de hasta 3 profesores. Los bloques en blanco representan disponibilidad común para reuniones.</p>
         </div>
-        <div class="stats-badge" id="teacherCount">118 Docentes Verificados</div>
+        <div class="stats-badge">118 Docentes Consolidados</div>
     </header>
 
-    <div class="search-box">
-        <input type="text" id="searchTeacher" placeholder="Escribe el nombre del profesor (Ej: HIDALGO, VALERA, GUZMAN...)" autocomplete="off">
-        <div id="suggestions" class="suggestions"></div>
+    <!-- Fila de Buscadores Triples en Paralelo -->
+    <div class="search-grid">
+        <div class="search-group">
+            <label>Docente 1</label>
+            <div class="search-box">
+                <input type="text" id="search0" data-index="0" placeholder="Buscar primer docente..." autocomplete="off">
+                <div id="suggestions0" class="suggestions"></div>
+            </div>
+        </div>
+        <div class="search-group">
+            <label>Docente 2</label>
+            <div class="search-box">
+                <input type="text" id="search1" data-index="1" placeholder="Buscar segundo docente..." autocomplete="off">
+                <div id="suggestions1" class="suggestions"></div>
+            </div>
+        </div>
+        <div class="search-group">
+            <label>Docente 3</label>
+            <div class="search-box">
+                <input type="text" id="search2" data-index="2" placeholder="Buscar tercer docente..." autocomplete="off">
+                <div id="suggestions2" class="suggestions"></div>
+            </div>
+        </div>
     </div>
 
+    <!-- Panel del Calendario Cruzado -->
     <div class="schedule-card">
-        <div class="teacher-info" id="selectedTeacherName">Selecciona un docente para visualizar su agenda</div>
+        <div class="teacher-info" id="selectedTeachersSummary">
+            Filtros activos: Ningún docente seleccionado (Mostrando calendario vacío)
+        </div>
         
         <table id="scheduleTable">
             <thead>
@@ -223,15 +279,17 @@
                 </tr>
             </thead>
             <tbody id="scheduleBody">
-                </tbody>
+                <!-- Se autogenera dinámicamente de 7:00 am a 10:00 pm -->
+            </tbody>
         </table>
 
-        <div id="sharedNote" class="shared-note"></div>
+        <!-- Contenedor dinámico de notas rojas -->
+        <div id="notesContainer" class="notes-container"></div>
     </div>
 </div>
 
 <script>
-    // BASE DE DATOS INTEGRAL CORREGIDA AL 100% SIN OMISIONES NI DUPLICADOS
+    // BASE DE DATOS INTEGRAL COMPLETA AL 100% (118 DOCENTES SIN DUPLICADOS)
     const docentesDB = {
         "ACUÑA SILLO ELBA": {"horarios": [{"dia": "Viernes", "start": 9, "end": 12, "tag": "9 a 12 pm"}], "compartido": false, "companeros": []},
         "AGURTO ADRIANZEN MARCOS": {"horarios": [{"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
@@ -353,6 +411,9 @@
         "VITE TALLEDO FRANCISCO": {"horarios": [{"dia": "Martes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []}
     };
 
+    // Almacena los 3 docentes seleccionados en tiempo real
+    let docentesSeleccionados = ["", "", ""];
+
     // Inicializar la tabla de horarios visuales (Filas por hora de 7:00 am a 10:00 pm)
     function initScheduleTable() {
         const body = document.getElementById('scheduleBody');
@@ -370,7 +431,7 @@
             tdHora.innerText = `${displayHour} - ${nextHour}`;
             tr.appendChild(tdHora);
             
-            // Columnas para cada día de la semana
+            // Columnas para cada día
             dias.forEach(dia => {
                 const td = document.createElement('td');
                 td.id = `cell-${dia}-${h}`;
@@ -381,87 +442,131 @@
         }
     }
 
-    // Renderizar la agenda unificada del docente seleccionado
-    function displayTeacherSchedule(nombreDocente) {
-        // Limpiar celdas previas de la tabla
+    // Actualiza por completo el cruce de horarios en el calendario
+    function recalculateSchedules() {
+        // 1. Limpiar celdas previas de la tabla por completo
         document.querySelectorAll('#scheduleBody td:not(.time-col)').forEach(td => {
             td.className = '';
             td.innerText = '';
         });
 
-        const info = docentesDB[nombreDocente];
-        const titleDiv = document.getElementById('selectedTeacherName');
-        const noteDiv = document.getElementById('sharedNote');
+        // Matriz temporal para mapear quiénes están ocupados en cada celda
+        const mapaOcupacion = {};
 
-        if (!info) {
-            titleDiv.innerText = "Docente no encontrado";
-            noteDiv.style.display = 'none';
-            return;
-        }
+        // 2. Filtrar docentes válidos seleccionados
+        const activos = docentesSeleccionados.filter(p => p && docentesDB[p]);
 
-        titleDiv.innerText = `Horario Ocupado: ${nombreDocente}`;
-
-        // Alerta roja si comparte curso con otro docente
-        if (info.compartido && info.companeros.length > 0) {
-            noteDiv.innerText = `⚠️ Este docente comparte curso con: ${info.companeros.join(', ')}`;
-            noteDiv.style.display = 'block';
+        // Actualizar barra de estado superior
+        const summary = document.getElementById('selectedTeachersSummary');
+        if (activos.length === 0) {
+            summary.innerText = "Filtros activos: Ningún docente seleccionado (Mostrando calendario vacío)";
         } else {
-            noteDiv.style.display = 'none';
+            summary.innerText = `Filtros activos: ${activos.join(' ── ')}`;
         }
 
-        // Pintar todos los bloques consolidados en color azul
-        info.horarios.forEach(bloque => {
-            for (let h = bloque.start; h < bloque.end; h++) {
-                const cell = document.getElementById(`cell-${bloque.dia}-${h}`);
-                if (cell) {
-                    cell.className = 'occupied';
-                    cell.innerText = 'DICTANDO CLASE';
+        // 3. Procesar las alertas de cursos compartidos de todos los activos
+        const notesContainer = document.getElementById('notesContainer');
+        notesContainer.innerHTML = '';
+        
+        activos.forEach(prof => {
+            const info = docentesDB[prof];
+            if (info.compartido && info.companeros.length > 0) {
+                const noteDiv = document.createElement('div');
+                noteDiv.className = 'shared-note';
+                noteDiv.innerText = `⚠️ El docente "${prof}" comparte curso con: ${info.companeros.join(', ')}`;
+                notesContainer.appendChild(noteDiv);
+            }
+        });
+
+        // 4. Mapear cruce de horarios
+        activos.forEach(prof => {
+            const info = docentesDB[prof];
+            info.horarios.forEach(bloque => {
+                for (let h = bloque.start; h < bloque.end; h++) {
+                    const key = `${bloque.dia}-${h}`;
+                    if (!mapaOcupacion[key]) {
+                        mapaOcupacion[key] = [];
+                    }
+                    // Añadir el nombre del profesor que está ocupado en esta hora
+                    if (!mapaOcupacion[key].includes(prof)) {
+                        mapaOcupacion[key].push(prof);
+                    }
                 }
+            });
+        });
+
+        // 5. Pintar los bloques acumulados en el calendario en color azul
+        Object.keys(mapaOcupacion).forEach(key => {
+            const cell = document.getElementById(`cell-${key}`);
+            if (cell) {
+                const listaProfes = mapaOcupacion[key];
+                cell.className = 'occupied';
+                // Si hay más de un profesor ocupado, listarlos de forma ordenada
+                cell.innerHTML = `OCUPADO POR:<br><strong>${listaProfes.join('<br>')}</strong>`;
             }
         });
     }
 
-    // Configurar lógica del buscador reactivo y autocompletado
-    const searchInput = document.getElementById('searchTeacher');
-    const suggestionsDiv = document.getElementById('suggestions');
+    // Configurar el comportamiento de los 3 buscadores autónomos
+    for (let i = 0; i < 3; i++) {
+        const input = document.getElementById(`search${i}`);
+        const suggestionsDiv = document.getElementById(`suggestions${i}`);
 
-    searchInput.addEventListener('input', function() {
-        const query = this.value.toUpperCase().trim();
-        suggestionsDiv.innerHTML = '';
-        
-        if (!query) {
-            suggestionsDiv.style.display = 'none';
-            return;
-        }
+        input.addEventListener('input', function() {
+            const query = this.value.toUpperCase().trim();
+            suggestionsDiv.innerHTML = '';
+            
+            if (!query) {
+                suggestionsDiv.style.display = 'none';
+                docentesSeleccionados[i] = ""; // Liberar espacio si se borra el texto
+                recalculateSchedules();
+                return;
+            }
 
-        // Filtrar nombres sin coincidencias duplicadas
-        const matches = Object.keys(docentesDB).filter(nombre => nombre.includes(query));
+            // Filtrar nombres que coincidan en la base de datos completa
+            const matches = Object.keys(docentesDB).filter(nombre => nombre.includes(query));
 
-        if (matches.length > 0) {
-            matches.slice(0, 6).forEach(match => {
-                const div = document.createElement('div');
-                div.innerText = match;
-                div.addEventListener('click', () => {
-                    searchInput.value = match;
-                    suggestionsDiv.style.display = 'none';
-                    displayTeacherSchedule(match);
+            if (matches.length > 0) {
+                matches.slice(0, 5).forEach(match => {
+                    const div = document.createElement('div');
+                    div.innerText = match;
+                    div.addEventListener('click', () => {
+                        input.value = match;
+                        suggestionsDiv.style.display = 'none';
+                        docentesSeleccionados[i] = match; // Asignar al slot correspondiente
+                        recalculateSchedules(); // Refrescar matriz de horarios
+                    });
+                    suggestionsDiv.appendChild(div);
                 });
-                suggestionsDiv.appendChild(div);
-            });
-            suggestionsDiv.style.display = 'block';
-        } else {
-            suggestionsDiv.style.display = 'none';
-        }
-    });
+                suggestionsDiv.style.display = 'block';
+            } else {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
 
-    // Ocultar sugerencias al hacer clic fuera del input
+        // Limpieza si el usuario borra manualmente y deja el campo en blanco
+        input.addEventListener('blur', function() {
+            setTimeout(() => {
+                if (this.value.trim() === "") {
+                    docentesSeleccionados[i] = "";
+                    recalculateSchedules();
+                }
+            }, 200);
+        });
+    }
+
+    // Ocultar todas las cajas de sugerencias al hacer clic fuera de ellas
     document.addEventListener('click', function(e) {
-        if (e.target !== searchInput) {
-            suggestionsDiv.style.display = 'none';
+        for (let i = 0; i < 3; i++) {
+            const input = document.getElementById(`search${i}`);
+            const suggestionsDiv = document.getElementById(`suggestions${i}`);
+            if (e.target !== input) {
+                suggestionsDiv.style.display = 'none';
+            }
         }
     });
 
-    // Inicialización del calendario
+    // Carga inicial de la matriz vacía
     initScheduleTable();
 </script>
 </body>
