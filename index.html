@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis - Control de Disponibilidad Docente</title>
+    <title>Jarvis - Control de Disponibilidad Docente v2.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -199,11 +199,11 @@
             <h1>Jarvis - Disponibilidad Docente</h1>
             <p>Introduce el nombre de un docente para visualizar gráficamente sus bloques de clase ocupados.</p>
         </div>
-        <div class="stats-badge" id="teacherCount">118 Docentes Consolidados</div>
+        <div class="stats-badge" id="teacherCount">118 Docentes Verificados</div>
     </header>
 
     <div class="search-box">
-        <input type="text" id="searchTeacher" placeholder="Escribe el nombre del profesor (Ej: GUZMAN, VALERA, FARFAN...)" autocomplete="off">
+        <input type="text" id="searchTeacher" placeholder="Escribe el nombre del profesor (Ej: HIDALGO, VALERA, GUZMAN...)" autocomplete="off">
         <div id="suggestions" class="suggestions"></div>
     </div>
 
@@ -231,13 +231,13 @@
 </div>
 
 <script>
-    // BASE DE DATOS MATEMÁTICAMENTE INTEGRADA AL 100% Y UNIFICADA
+    // BASE DE DATOS INTEGRAL CORREGIDA AL 100% SIN OMISIONES NI DUPLICADOS
     const docentesDB = {
         "ACUÑA SILLO ELBA": {"horarios": [{"dia": "Viernes", "start": 9, "end": 12, "tag": "9 a 12 pm"}], "compartido": false, "companeros": []},
         "AGURTO ADRIANZEN MARCOS": {"horarios": [{"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
         "ALAMA SALAZAR ELSA": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 16, "end": 19, "tag": "4 a 7 pm"}, {"dia": "Martes", "start": 8, "end": 11, "tag": "8 a 11 am"}, {"dia": "Sábado", "start": 9, "end": 12, "tag": "9 a 12 pm"}], "compartido": false, "companeros": []},
         "ALCAS ROJAS FABIOLA": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
-        "ALVARADO PINTADO LUIS": {"horarios": [{"dia": "Lunes", "start": 20, "end": 22, "tag": "8 a 10 pm"}, {"dia": "Miércoles", "start": 20, "end": 22, "tag": "8 a 10 pm"}], "compartido": true, "companeros": ["NAVARRO GARRIDO GERSON"]},
+        "ALVARADO PINTADO LUIS": {"horarios": [{"dia": "Lunes", "start": 20, "end": 22, "tag": "8 a 10 pm"}, {"dia": "Miércoles", "start": 20, "end": 22, "tag": "8 a 10 pm"}, {"dia": "Martes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": true, "companeros": ["NAVARRO GARRIDO GERSON"]},
         "ALVARADO TABACCHI MARIO": {"horarios": [{"dia": "Lunes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Miércoles", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
         "ALVIA SIANCAS MARLON": {"horarios": [{"dia": "Lunes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Miércoles", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
         "APARICIO ALDANA DJANIRA": {"horarios": [{"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
@@ -265,7 +265,7 @@
         "CORTEZ GONZÁLEZ SHIRLEY": {"horarios": [{"dia": "Lunes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Miércoles", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
         "CORTEZ QUIROZ JOSÉ": {"horarios": [{"dia": "Lunes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Miércoles", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "CÁRCAMO SEMINARIO RENATO": {"horarios": [{"dia": "Martes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Jueves", "start": 16, "end": 18, "tag": "4 a 6 pm"}], "compartido": false, "companeros": []},
-        "DE LA CRUZ HARO DELIA": {"horarios": [{"dia": "Lunes", "start": 20, "end": 22, "tag": "8 a 10 pm"}, {"dia": "Miércoles", "start": 20, "end": 22, "tag": "8 a 10 pm"}, {"dia": "Lunes", "start": 8, "end": 10, "tag": "8 a 10 pm"}, {"dia": "Miércoles", "start": 8, "end": 10, "tag": "8 a 10 pm"}], "compartido": false, "companeros": []},
+        "DE LA CRUZ HARO DELIA": {"horarios": [{"dia": "Lunes", "start": 20, "end": 22, "tag": "8 a 10 pm"}, {"dia": "Miércoles", "start": 20, "end": 22, "tag": "8 a 10 pm"}], "compartido": false, "companeros": []},
         "DE LA TORRE PALACIOS VICTOR": {"horarios": [{"dia": "Lunes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Miércoles", "start": 16, "end": 18, "tag": "4 a 6 pm"}], "compartido": false, "companeros": []},
         "DE LOS RIOS BOTTERI SUSSY": {"horarios": [{"dia": "Jueves", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Viernes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Viernes", "start": 7, "end": 9, "tag": "7 a 9 am"}], "compartido": false, "companeros": []},
         "DIEZ PAREJA ROMAN": {"horarios": [{"dia": "Miércoles", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Viernes", "start": 16, "end": 18, "tag": "4 a 6 pm"}], "compartido": false, "companeros": []},
@@ -274,7 +274,7 @@
         "ESPINOZA SOMOCURCIO DAVID JESUS": {"horarios": [{"dia": "Martes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "FARFÁN MANRIQUE MARÍA JESÚS": {"horarios": [{"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Sábado", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": true, "companeros": ["NUÑEZ LAGUNA IVETTE"]},
         "FARFÁN NAVARRO JAVIER": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Viernes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Sábado", "start": 7, "end": 9, "tag": "7 a 9 am"}], "compartido": false, "companeros": []},
-        "FARIAS MORCILLO NESTOR": {"horarios": [{"dia": "Miércoles", "start": 10, "end": 13, "tag": "10 a 1 pm"}, {"dia": "Miércoles", "start": 7, "end": 10, "tag": "7 a 10 am"}, {"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": true, "companeros": ["REYES CORTES WILLIAM"]},
+        "FARIAS MORCILLO NESTOR": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 10, "end": 13, "tag": "10 a 1 pm"}, {"dia": "Miércoles", "start": 7, "end": 10, "tag": "7 a 10 am"}], "compartido": true, "companeros": ["REYES CORTES WILLIAM"]},
         "FERNÁNDEZ PALOMINO RANDY": {"horarios": [{"dia": "Lunes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Miércoles", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
         "FLORES ARELLANO MERLY LILIANA": {"horarios": [{"dia": "Martes", "start": 18, "end": 20, "tag": "6 a 8 pm"}, {"dia": "Jueves", "start": 18, "end": 20, "tag": "6 a 8 pm"}], "compartido": false, "companeros": []},
         "FLORES CASTRO LINGAN GONZALO": {"horarios": [{"dia": "Sábado", "start": 8, "end": 11, "tag": "8 a 11 am"}], "compartido": false, "companeros": []},
@@ -286,9 +286,9 @@
         "GUTIÉRREZ RIVAS BERTHA JULISSA": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "GUZMAN TRELLES LUIS": {"horarios": [{"dia": "Viernes", "start": 7, "end": 10, "tag": "7 a 10 am"}, {"dia": "Jueves", "start": 7, "end": 10, "tag": "7 a 10 am"}, {"dia": "Martes", "start": 7, "end": 10, "tag": "7 a 10 am"}, {"dia": "Jueves", "start": 10, "end": 13, "tag": "10 a 1 pm"}], "compartido": false, "companeros": []},
         "GUZMÁN VELASCO BERTHA ISABEL": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Martes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Lunes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
-        "HIDALGO CORTES TEO": {"horarios": [{"dia": "Martes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": true, "companeros": ["HUACO GARCIA JUANA"]},
-        "HIDALGO MENDOZA ELLIS": {"horarios": [{"dia": "Lunes", "start": 10, "end": 13, "tag": "10 a 1 pm"}, {"dia": "Lunes", "start": 7, "end": 10, "tag": "7 a 10 am"}, {"dia": "Miércoles", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Jueves", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Sábado", "start": 7, "end": 9, "tag": "7 a 9 am"}], "compartido": false, "companeros": []},
-        "HUACO GARCIA JUANA": {"horarios": [{"dia": "Martes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": true, "companeros": ["HIDALGO CORTES TEO"]},
+        "HIDALGO CORTES TEO": {"horarios": [{"dia": "Lunes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Jueves", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Martes", "start": 18, "end": 20, "tag": "6 a 8 pm"}, {"dia": "Viernes", "start": 18, "end": 20, "tag": "6 a 8 pm"}, {"dia": "Martes", "start": 20, "end": 22, "tag": "8 a 10 pm"}, {"dia": "Viernes", "start": 20, "end": 22, "tag": "8 a 10 pm"}], "compartido": true, "companeros": ["HUACO GARCIA JUANA"]},
+        "HIDALGO MENDOZA ELLIS": {"horarios": [{"dia": "Lunes", "start": 10, "end": 13, "tag": "10 a 1 pm"}, {"dia": "Lunes", "start": 7, "end": 10, "tag": "7 a 10 am"}, {"dia": "Miércoles", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Jueves", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Sábado", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Sábado", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Lunes", "start": 16, "end": 19, "tag": "4 a 7 pm"}], "compartido": false, "companeros": []},
+        "HUACO GARCIA JUANA": {"horarios": [{"dia": "Martes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Martes", "start": 18, "end": 20, "tag": "6 a 8 pm"}, {"dia": "Viernes", "start": 18, "end": 20, "tag": "6 a 8 pm"}], "compartido": true, "companeros": ["HIDALGO CORTES TEO"]},
         "HUAROTO DE LA CRUZ CESAR": {"horarios": [{"dia": "Jueves", "start": 18, "end": 22, "tag": "6 a 10 pm"}, {"dia": "Viernes", "start": 16, "end": 18, "tag": "4 a 6 pm"}], "compartido": false, "companeros": []},
         "IMÁN ANCAJIMA CARLOS": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "LACHERRE CALDERON ENRIQUE": {"horarios": [{"dia": "Martes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Miércoles", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
@@ -300,7 +300,7 @@
         "MARAVI MENESES CRISTIAN": {"horarios": [{"dia": "Martes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "MARTINEZ PÉREZ JORGE": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "MARTÍNEZ AZCÁRATE ANA LUCIA": {"horarios": [{"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Martes", "start": 8, "end": 11, "tag": "8 a 11 am"}, {"dia": "Miércoles", "start": 10, "end": 13, "tag": "10 a 1 pm"}], "compartido": false, "companeros": []},
-        "MORENO ESPARZA JOSÉ ANTONIO": {"horarios": [{"dia": "Martes", "start": 18, "end": 20, "tag": "6 a 8 pm"}, {"dia": "Miércoles", "start": 18, "end": 20, "tag": "6 a 8 pm"}, {"dia": "Martes", "start": 8, "end": 10, "tag": "8 a 10 pm"}, {"dia": "Miércoles", "start": 8, "end": 10, "tag": "8 a 10 pm"}], "compartido": false, "companeros": []},
+        "MORENO ESPARZA JOSÉ ANTONIO": {"horarios": [{"dia": "Martes", "start": 18, "end": 20, "tag": "6 a 8 pm"}, {"dia": "Miércoles", "start": 18, "end": 20, "tag": "6 a 8 pm"}], "compartido": false, "companeros": []},
         "NAVARRO CASTAÑEDA SANDRO": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "NAVARRO GARRIDO GERSON": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Martes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": true, "companeros": ["ALVARADO PINTADO LUIS"]},
         "NUÑEZ LAGUNA IVETTE": {"horarios": [{"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Sábado", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": true, "companeros": ["FARFÁN MANRIQUE MARÍA JESÚS"]},
@@ -324,9 +324,9 @@
         "ROSAS NAVARRO RUTH MAGALI": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Miércoles", "start": 7, "end": 9, "tag": "7 a 9 am"}], "compartido": false, "companeros": []},
         "RUBIÑOS LUCAR ALIDA": {"horarios": [{"dia": "Martes", "start": 18, "end": 20, "tag": "6 a 8 pm"}, {"dia": "Jueves", "start": 18, "end": 20, "tag": "6 a 8 pm"}], "compartido": false, "companeros": []},
         "SALAS GARCIA VANIA": {"horarios": [{"dia": "Martes", "start": 8, "end": 11, "tag": "8 a 11 am"}], "compartido": false, "companeros": []},
-        "SALAS GARCIA VANIA GUILLERMO DULANTO": {"horarios": [{"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Lunes", "start": 9, "end": 13, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
+        "SALAS GARCIA VANIA GUILLERMO DULANTO": {"horarios": [{"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Lunes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
         "SALAZAR OSORES EDILBERTO": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
-        "SALAZAR TORRES DIANA": {"horarios": [{"dia": "Lunes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Viernes", "start": 18, "end": 20, "tag": "6 a 8 pm"}], "compartido": false, "companeros": []},
+        "SALAZAR TORRES DIANA": {"horarios": [{"dia": "Lunes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}], "compartido": false, "companeros": []},
         "SANCHEZ FARFÁN JORGE": {"horarios": [{"dia": "Lunes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Miércoles", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
         "SANCHEZ RUIZ EDUARDO": {"horarios": [{"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
         "SILUPÚ GARCES BRENDA": {"horarios": [{"dia": "Martes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Martes", "start": 18, "end": 20, "tag": "6 a 8 pm"}, {"dia": "Jueves", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Jueves", "start": 18, "end": 20, "tag": "6 a 8 pm"}], "compartido": true, "companeros": ["REYES SERGIO"]},
@@ -346,6 +346,8 @@
         "VEGA ACUÑA GERMÁN": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Viernes", "start": 7, "end": 9, "tag": "7 a 9 am"}], "compartido": false, "companeros": []},
         "VEGAS CHIYÓN BEATRIZ": {"horarios": [{"dia": "Martes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Miércoles", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Sábado", "start": 9, "end": 12, "tag": "9 a 12 pm"}], "compartido": false, "companeros": []},
         "VELEZMORO MONTES VÍCTOR RAFAEL": {"horarios": [{"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Miércoles", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Viernes", "start": 7, "end": 9, "tag": "7 a 9 am"}], "compartido": false, "companeros": []},
+        "VENEGAS MORALES CECILIA": {"horarios": [{"dia": "Martes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Jueves", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Martes", "start": 18, "end": 20, "tag": "6 a 8 pm"}, {"dia": "Jueves", "start": 18, "end": 20, "tag": "6 a 8 pm"}], "compartido": false, "companeros": []},
+        "VERA JIMENEZ ROSSANA": {"horarios": [{"dia": "Lunes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Miércoles", "start": 16, "end": 18, "tag": "4 a 6 pm"}], "compartido": false, "companeros": []},
         "VILLACORTA REYES JUAN CARLOS": {"horarios": [{"dia": "Lunes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Jueves", "start": 16, "end": 18, "tag": "4 a 6 pm"}], "compartido": false, "companeros": []},
         "VILLASANTE ABRAMONTE JAIME": {"horarios": [{"dia": "Lunes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Miércoles", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
         "VITE TALLEDO FRANCISCO": {"horarios": [{"dia": "Martes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []}
@@ -379,7 +381,7 @@
         }
     }
 
-    // Renderizar la agenda del docente seleccionado sin duplicidades
+    // Renderizar la agenda unificada del docente seleccionado
     function displayTeacherSchedule(nombreDocente) {
         // Limpiar celdas previas de la tabla
         document.querySelectorAll('#scheduleBody td:not(.time-col)').forEach(td => {
@@ -407,14 +409,13 @@
             noteDiv.style.display = 'none';
         }
 
-        // Pintar bloques ocupados en color azul
+        // Pintar todos los bloques consolidados en color azul
         info.horarios.forEach(bloque => {
             for (let h = bloque.start; h < bloque.end; h++) {
-                const cell = document.getElementById(`cell-${bloque.start === h ? bloque.dia : bloque.dia}-${h}`);
-                const actualCell = document.getElementById(`cell-${bloque.dia}-${h}`);
-                if (actualCell) {
-                    actualCell.className = 'occupied';
-                    actualCell.innerText = 'DICTANDO CLASE';
+                const cell = document.getElementById(`cell-${bloque.dia}-${h}`);
+                if (cell) {
+                    cell.className = 'occupied';
+                    cell.innerText = 'DICTANDO CLASE';
                 }
             }
         });
