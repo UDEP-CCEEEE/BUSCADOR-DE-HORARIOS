@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis - Planificador Inteligente de Reuniones v3.0</title>
+    <title>Jarvis - Planificador Inteligente de Reuniones v3.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -195,7 +195,7 @@
             color: #5e6c84;
         }
 
-        /* NUEVO ESTILO: Bloque Ocupado con Bordes Muy Definidos y Oscuros */
+        /* Bloque Ocupado con Bordes Muy Definidos y Oscuros */
         .occupied {
             background-color: var(--primary-blue) !important;
             color: white;
@@ -203,9 +203,9 @@
             font-size: 10px;
             line-height: 1.3;
             padding: 4px;
-            border: 2px solid var(--dark-blue) !important; /* Bordes gruesos y marcados */
+            border: 2px solid var(--dark-blue) !important; /* Bordes marcados */
             border-radius: 4px;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2); /* Brillo interno elegante */
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
             animation: fadeIn 0.2s ease;
         }
 
@@ -248,17 +248,16 @@
 <div class="container">
     <header>
         <div>
-            <h1>Jarvis - Planificador de Horarios Colectivos</h1>
-            <p>Define cuántos docentes necesitas cruzar. Los bloques vacíos indican horarios disponibles para todos.</p>
+            <h1>Jarvis</h1>
+            <p>Define cuántos participantes necesitas cruzar. Los bloques vacíos indican horarios disponibles para todos.</p>
         </div>
-        <div class="stats-badge">118 Docentes Cargados</div>
     </header>
 
     <!-- Panel de Selección de Cantidad -->
     <div class="control-panel">
-        <label for="buscadorCount">¿Cuántos docentes deseas cruzar en la reunión?</label>
+        <label for="buscadorCount">¿Cuántos participantes deseas cruzar en la reunión?</label>
         <select id="buscadorCount">
-            <!-- Autogenerado del 1 al 20 -->
+            <!-- Autogenerado del 1 al 20 con la palabra Participantes -->
         </select>
     </div>
 
@@ -268,7 +267,7 @@
     <!-- Panel del Calendario Colectivo -->
     <div class="schedule-card">
         <div class="teacher-info" id="selectedTeachersSummary">
-            Filtros activos: Ningún docente seleccionado
+            Filtros activos: Ningún participante seleccionado
         </div>
         
         <table id="scheduleTable">
@@ -288,13 +287,13 @@
             </tbody>
         </table>
 
-        <!-- Contenedor dinámico de notas rojas para profesores compartidos -->
+        <!-- Contenedor dinámico de notas rojas para cursos compartidos -->
         <div id="notesContainer" class="notes-container"></div>
     </div>
 </div>
 
 <script>
-    // BASE DE DATOS INTEGRAL 100% UNIFICADA (118 PROFESORES)
+    // BASE DE DATOS INTEGRAL 100% UNIFICADA (118 REGISTROS)
     const docentesDB = {
         "ACUÑA SILLO ELBA": {"horarios": [{"dia": "Viernes", "start": 9, "end": 12, "tag": "9 a 12 pm"}], "compartido": false, "companeros": []},
         "AGURTO ADRIANZEN MARCOS": {"horarios": [{"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
@@ -361,11 +360,12 @@
         "LÓPEZ ORTIZ MANUEL": {"horarios": [{"dia": "Jueves", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Viernes", "start": 16, "end": 18, "tag": "4 a 6 pm"}], "compartido": false, "companeros": []},
         "MACHUCA MAZA ALMA ROSA": {"horarios": [{"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
         "MARAVI MENESES CRISTIAN": {"horarios": [{"dia": "Martes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
-        "MARTINEZ PÉREZ JORGE": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
+        "MARTINEZ PÉREZ JORGE": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "bold": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "MARTÍNEZ AZCÁRATE ANA LUCIA": {"horarios": [{"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Martes", "start": 8, "end": 11, "tag": "8 a 11 am"}, {"dia": "Miércoles", "start": 10, "end": 13, "tag": "10 a 1 pm"}], "compartido": false, "companeros": []},
         "MORENO ESPARZA JOSÉ ANTONIO": {"horarios": [{"dia": "Martes", "start": 18, "end": 20, "tag": "6 a 8 pm"}, {"dia": "Miércoles", "start": 18, "end": 20, "tag": "6 a 8 pm"}], "compartido": false, "companeros": []},
         "NAVARRO CASTAÑEDA SANDRO": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "NAVARRO GARRIDO GERSON": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Martes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": true, "companeros": ["ALVARADO PINTADO LUIS"]},
+        "NUÑEZ LAGUNA IVETTE": {"horarios": [{"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Sábado", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": true, "companeros": ["FARFÁN MANRIQUE MARÍA JESÚS"]},
         "NUÑEZ LAGUNA IVETTE": {"horarios": [{"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Sábado", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": true, "companeros": ["FARFÁN MANRIQUE MARÍA JESÚS"]},
         "OLAECHEA ALMANDOZ ENRIQUE": {"horarios": [{"dia": "Lunes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Miércoles", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "ORMEÑO SANCHEZ RICARDO": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
@@ -384,7 +384,7 @@
         "RIOFRIO ZUÑIGA FERNANDO": {"horarios": [{"dia": "Lunes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Miércoles", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Miércoles", "start": 7, "end": 9, "tag": "7 a 9 am"}], "compartido": false, "companeros": []},
         "RIVERA TÁVARA CLAUDIA": {"horarios": [{"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "RODRICH PORTUGAL CARLOS": {"horarios": [{"dia": "Lunes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Miércoles", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
-        "ROSAS NAVARRO RUTH MAGALI": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "bold": 13, "tag": "11 a 1 pm"}, {"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Miércoles", "start": 7, "end": 9, "tag": "7 a 9 am"}], "compartido": false, "companeros": []},
+        "ROSAS NAVARRO RUTH MAGALI": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Miércoles", "start": 7, "end": 9, "tag": "7 a 9 am"}], "compartido": false, "companeros": []},
         "RUBIÑOS LUCAR ALIDA": {"horarios": [{"dia": "Martes", "start": 18, "end": 20, "tag": "6 a 8 pm"}, {"dia": "Jueves", "start": 18, "end": 20, "tag": "6 a 8 pm"}], "compartido": false, "companeros": []},
         "SALAS GARCIA VANIA": {"horarios": [{"dia": "Martes", "start": 8, "end": 11, "tag": "8 a 11 am"}], "compartido": false, "companeros": []},
         "SALAS GARCIA VANIA GUILLERMO DULANTO": {"horarios": [{"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}], "compartido": false, "companeros": []},
@@ -425,7 +425,7 @@
         for (let i = 1; i <= 20; i++) {
             const opt = document.createElement('option');
             opt.value = i;
-            opt.innerText = `${i} ${i === 1 ? 'Docente' : 'Docentes simultáneos'}`;
+            opt.innerText = `${i} ${i === 1 ? 'Participante' : 'Participantes'}`;
             select.appendChild(opt);
         }
         select.addEventListener('change', function() {
@@ -462,12 +462,10 @@
         const container = document.getElementById('searchBarsContainer');
         const valoresAnteriores = [...docentesSeleccionados];
         
-        // Reestructurar array de control
         docentesSeleccionados = new Array(nuevaCantidad).fill("");
         container.innerHTML = "";
 
         for (let i = 0; i < nuevaCantidad; i++) {
-            // Reestablecer valor previo si existía
             if (valoresAnteriores[i]) {
                 docentesSeleccionados[i] = valoresAnteriores[i];
             }
@@ -475,9 +473,9 @@
             const group = document.createElement('div');
             group.className = 'search-group';
             group.innerHTML = `
-                <label>Docente ${i + 1}</label>
+                <label>Participante ${i + 1}</label>
                 <div class="search-box">
-                    <input type="text" id="search-${i}" placeholder="Escribe el apellido..." autocomplete="off" value="${docentesSeleccionados[i]}">
+                    <input type="text" id="search-${i}" placeholder="Escribe el nombre o apellido..." autocomplete="off" value="${docentesSeleccionados[i]}">
                     <div id="suggestions-${i}" class="suggestions"></div>
                 </div>
             `;
@@ -523,7 +521,6 @@
             }
         });
 
-        // Limpieza si el campo queda vacío
         input.addEventListener('blur', function() {
             setTimeout(() => {
                 if (this.value.trim() === "") {
@@ -536,7 +533,6 @@
 
     // Cruzar agendas en la matriz horaria acumulativa
     function recalculateSchedules() {
-        // Limpiar celdas previas por completo
         document.querySelectorAll('#scheduleBody td:not(.time-col)').forEach(td => {
             td.className = '';
             td.innerText = '';
@@ -545,13 +541,11 @@
         const mapaOcupacion = {};
         const activos = docentesSeleccionados.filter(p => p && docentesDB[p]);
 
-        // Resumen superior
         const summary = document.getElementById('selectedTeachersSummary');
         summary.innerText = activos.length === 0 
-            ? "Filtros activos: Ningún docente seleccionado" 
+            ? "Filtros activos: Ningún participante seleccionado" 
             : `Filtros activos: ${activos.join(' ── ')}`;
 
-        // Renderizar notas de cursos compartidos
         const notesContainer = document.getElementById('notesContainer');
         notesContainer.innerHTML = '';
         activos.forEach(prof => {
@@ -559,12 +553,11 @@
             if (info.compartido && info.companeros.length > 0) {
                 const noteDiv = document.createElement('div');
                 noteDiv.className = 'shared-note';
-                noteDiv.innerText = `⚠️ El docente "${prof}" comparte curso con: ${info.companeros.join(', ')}`;
+                noteDiv.innerText = `⚠️ El participante "${prof}" comparte curso con: ${info.companeros.join(', ')}`;
                 notesContainer.appendChild(noteDiv);
             }
         });
 
-        // Cruzar bloques horarios
         activos.forEach(prof => {
             docentesDB[prof].horarios.forEach(bloque => {
                 for (let h = bloque.start; h < bloque.end; h++) {
@@ -575,7 +568,6 @@
             });
         });
 
-        // Colorear e inyectar bordes definidos en las celdas ocupadas
         Object.keys(mapaOcupacion).forEach(key => {
             const cell = document.getElementById(`cell-${key}`);
             if (cell) {
@@ -585,17 +577,15 @@
         });
     }
 
-    // Ocultar listas sueltas al hacer clic en zonas vacías de la página
     document.addEventListener('click', function(e) {
         if (!e.target.id.startsWith('search-')) {
             document.querySelectorAll('.suggestions').forEach(div => div.style.display = 'none');
         }
     });
 
-    // Carga inicial automática de la herramienta
     initBuscadorSelect();
     initScheduleTable();
-    ajustarCantidadBuscadores(1); // Iniciar por defecto con 1 barra
+    ajustarCantidadBuscadores(1); 
 </script>
 </body>
 </html>
