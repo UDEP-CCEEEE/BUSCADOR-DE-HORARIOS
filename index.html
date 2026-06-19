@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jarvis - Planificador Inteligente de Reuniones v3.1</title>
+    <title>Jarvis - Planificador Inteligente de Reuniones v3.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,6 +13,7 @@
             --danger-red: #d93025;
             --bg-gray: #f4f5f7;
             --text-dark: #172b4d;
+            --text-tenue: #97a0af;  /* Gris tenue para el crédito del creador */
             --border-color: #c1c7d0; /* Borde de la tabla un poco más marcado */
         }
 
@@ -47,6 +48,19 @@
             align-items: center;
         }
 
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-logo {
+            height: 55px;
+            width: auto;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
         header h1 {
             font-size: 24px;
             color: var(--primary-blue);
@@ -57,6 +71,16 @@
             font-size: 14px;
             color: #5e6c84;
             margin-top: 5px;
+        }
+
+        /* Estilo para la firma del Creador en la parte superior derecha */
+        .creator-tag {
+            font-size: 12px;
+            color: var(--text-tenue);
+            font-weight: 500;
+            align-self: flex-start;
+            padding-top: 5px;
+            letter-spacing: 0.3px;
         }
 
         /* Panel de Control Dinámico */
@@ -247,17 +271,23 @@
 
 <div class="container">
     <header>
-        <div>
-            <h1>Jarvis</h1>
-            <p>Define cuántos participantes necesitas cruzar. Los bloques vacíos indican horarios disponibles para todos.</p>
+        <div class="header-left">
+            <!-- Imagen de la mascota Jarvis -->
+            <img src="JARVIS. PNG.jfif" alt="Jarvis" class="header-logo">
+            <div>
+                <h1>Jarvis</h1>
+                <p>Define cuántos participantes necesitas cruzar. Los bloques vacíos indican horarios disponibles para todos.</p>
+            </div>
         </div>
+        <!-- Firma tenue del creador -->
+        <div class="creator-tag">Creador: Lázaro Purizaca</div>
     </header>
 
     <!-- Panel de Selección de Cantidad -->
     <div class="control-panel">
         <label for="buscadorCount">¿Cuántos participantes deseas cruzar en la reunión?</label>
         <select id="buscadorCount">
-            <!-- Autogenerado del 1 al 20 con la palabra Participantes -->
+            <!-- Autogenerado del 1 al 20 -->
         </select>
     </div>
 
@@ -360,12 +390,11 @@
         "LÓPEZ ORTIZ MANUEL": {"horarios": [{"dia": "Jueves", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Viernes", "start": 16, "end": 18, "tag": "4 a 6 pm"}], "compartido": false, "companeros": []},
         "MACHUCA MAZA ALMA ROSA": {"horarios": [{"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": false, "companeros": []},
         "MARAVI MENESES CRISTIAN": {"horarios": [{"dia": "Martes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
-        "MARTINEZ PÉREZ JORGE": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "bold": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
+        "MARTINEZ PÉREZ JORGE": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "MARTÍNEZ AZCÁRATE ANA LUCIA": {"horarios": [{"dia": "Martes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Jueves", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Lunes", "start": 7, "end": 9, "tag": "7 a 9 am"}, {"dia": "Martes", "start": 8, "end": 11, "tag": "8 a 11 am"}, {"dia": "Miércoles", "start": 10, "end": 13, "tag": "10 a 1 pm"}], "compartido": false, "companeros": []},
         "MORENO ESPARZA JOSÉ ANTONIO": {"horarios": [{"dia": "Martes", "start": 18, "end": 20, "tag": "6 a 8 pm"}, {"dia": "Miércoles", "start": 18, "end": 20, "tag": "6 a 8 pm"}], "compartido": false, "companeros": []},
         "NAVARRO CASTAÑEDA SANDRO": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "NAVARRO GARRIDO GERSON": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Martes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": true, "companeros": ["ALVARADO PINTADO LUIS"]},
-        "NUÑEZ LAGUNA IVETTE": {"horarios": [{"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Sábado", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": true, "companeros": ["FARFÁN MANRIQUE MARÍA JESÚS"]},
         "NUÑEZ LAGUNA IVETTE": {"horarios": [{"dia": "Jueves", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 9, "end": 11, "tag": "9 a 11 am"}, {"dia": "Sábado", "start": 9, "end": 11, "tag": "9 a 11 am"}], "compartido": true, "companeros": ["FARFÁN MANRIQUE MARÍA JESÚS"]},
         "OLAECHEA ALMANDOZ ENRIQUE": {"horarios": [{"dia": "Lunes", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Miércoles", "start": 16, "end": 18, "tag": "4 a 6 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
         "ORMEÑO SANCHEZ RICARDO": {"horarios": [{"dia": "Lunes", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Miércoles", "start": 11, "end": 13, "tag": "11 a 1 pm"}, {"dia": "Viernes", "start": 11, "end": 13, "tag": "11 a 1 pm"}], "compartido": false, "companeros": []},
@@ -560,7 +589,7 @@
 
         activos.forEach(prof => {
             docentesDB[prof].horarios.forEach(bloque => {
-                for (let h = bloque.start; h < bloque.end; h++) {
+                for (let h = module = bloque.start; h < bloque.end; h++) {
                     const key = `${bloque.dia}-${h}`;
                     if (!mapaOcupacion[key]) mapaOcupacion[key] = [];
                     if (!mapaOcupacion[key].includes(prof)) mapaOcupacion[key].push(prof);
